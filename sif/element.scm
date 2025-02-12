@@ -1,6 +1,6 @@
 (define-module (sif element))
 (export <element>
-        list-actions action)
+        list-actions action add)
 
 (import (oop goops)
         (ice-9 optargs)
