@@ -1,0 +1,2 @@
+(load "world.scm")
+
