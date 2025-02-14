@@ -7,6 +7,7 @@
         (ice-9 match)
         (srfi srfi-1))
 
+;;; Generic element, should be used by about anything
 (define-class <element> ()
   (name #:init-value ""
         #:getter name
