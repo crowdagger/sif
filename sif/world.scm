@@ -1,7 +1,9 @@
 (define-module (sif world))
 (export <world>
-        world-add! world-ref world-del!)
+        world-add! world-add-list! world-ref world-del!
+        world->list list->world)
 (import (oop goops)
+        (ice-9 match)
         (crow-utils vec)
         (sif element))
 
@@ -10,22 +12,6 @@
   (elements #:init-form (make-vec)
             #:getter world-elements))
 
-(define (world->list w)
-  "Converts the world w to a standard lisp list"
-  (let* ([elements (map (λ (e)
-                         (element->list e))
-                        ((world-elements w) '->list))])
-    `(<world> ((elements . ,elements)))))
-
-(define-method (write (w <world>) . args)
-  (apply write (cons (world->list w) args)))
-  ;; (let* ([elements (map (λ (e)
-  ;;                        (format #f "~a" e))
-  ;;                       ((world-elements w) '->list))]
-  ;;       [elements (apply string-append elements)]
-  ;;       [s (format #f "(<world> ((elements . ~a)))"
-  ;;                  elements)])
-  ;;   (apply write (cons s args))))
 
 (define (world-add! world e)
   "Add an element to the world, return its index"
@@ -40,9 +26,52 @@
   "Deletes element i, setting it to #f"
   ((world-elements world) 'set! i #f))
 
-(define w (make <world>))
-(world-add! w 42)
-(display (world-ref w 0))
-(world-del! w 0)
-(display (world-ref w 0))
 
+(define (world->list w)
+  "Converts the world w to a standard lisp list"
+  (let* ([elements ((world-elements w) '->list)]
+         [elements (filter (lambda (x) x)
+                           elements)] ; remove #f values
+         [elements (map (λ (e)
+                         (element->list e))
+                        elements)])
+    `(<world> ((elements . ,elements)))))
+
+;;; Override write method
+(define-method (write (w <world>) . args)
+  (apply write (cons (world->list w) args)))
+
+(define (world-add-list! world list)
+  "Transform a list to an element in given world.
+Also adds it to the world"
+  (match-let ([(clss tail) list])
+    (let ([e (cond
+              [(eq? clss '<element>) (make <element> #:world world)]
+              [else (error "Invalid class" clss)])])
+      (for-each (lambda (v)
+                  (if (eq? (car v) 'id)
+                      (unless (eq? (slot-ref e 'id)
+                                   (cdr v))
+                        (error "Element id does not match world id"
+                               (cdr v)
+                               (slot-ref e 'id)))
+
+                      (slot-set! e (car v) (cdr v))))
+                tail)
+      e)))
+
+
+(define (list->world lst)
+  "Transform a list of world to a world object, allowing deserialization"
+  (match lst
+    [(clss (('elements . elements))) 
+     (unless (eq? clss '<world>)
+       (error "Invalid class, expected world" clss))
+     (let lp ([world (make <world>)]
+              [rest elements])
+       (if (null? rest)
+           world
+          (begin
+            (world-add-list! world (car rest))
+            (lp world (cdr rest)))))]
+    [else (error "Invalid list pattern for a world" lst)]))

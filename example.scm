@@ -19,18 +19,14 @@
 (write room)
 (newline)
 (write table)
-(newline)
-(define s (call-with-output-string
-            (lambda (port)
-              (write table port))))
-(display s)
-(newline)
-(define v (call-with-input-string s
-            (lambda (port)
-              (element-read w port))))
+;(world-add-list! w (element->list v))
 
-(write (element->list v))
+(newline)
+(display (world->list w))
 (newline)
 
-(pretty-print w #:display? #t #:width 50)
+(define w2 (list->world
+            (world->list w)))
+
+(display (world->list w2))
 (newline)

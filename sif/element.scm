@@ -1,7 +1,8 @@
 (define-module (sif element))
 (export <element>
-        element->alist element->list
-        element-read id list-actions action add!)
+        element->alist element->list 
+        element-read id list-actions action
+        add! look-at)
 
 (import (oop goops)
         (ice-9 optargs)
@@ -66,14 +67,21 @@
     (unless (eq? world world2)
       (error "Elements are from different worlds" e1 e2))
     (slot-set! e1 'inner new-list)))
-  
+
+;;; Method used when (make <element>) is called
 (define-method (initialize (e <element>) initargs)
+  ;; Call parent method
   (next-method)
   ;; Add self to world and set id
   (if (element-world e)
-      (slot-set! e 'id
-                 (world-add! (element-world e)
-                             e)))
+      (let ([id (world-add! (element-world e)
+                            e)])
+        (when (and (slot-ref e 'id)
+                   (not (eq? (slot-ref e 'id)
+                             id)))
+          (error "Previous id does not match world's id"))
+        (slot-set! e 'id id))
+      (error "Need to specify a word to create an element"))
       
   ;; Add default actions 
   (add-action e 'look-at (λ (e) (look-at e)))
@@ -94,7 +102,6 @@
     (when (eq? #f handler)
       (error "Unsupported action" action))
     (apply handler (cons e args))))
-
 
 (define (element-read world port)
   "Read an element from optional port"
@@ -118,10 +125,11 @@
 (define-generic element->alist)
 (define-method (element->alist (x <element>))
   `(
-   (name . ,(element-name x))
-   (description . ,(element-description x))
-   (container . ,(element-container x))
-   (inner . ,(element-inner x))))
+    (id . ,(element-id x))
+    (name . ,(element-name x))
+    (description . ,(element-description x))
+    (container . ,(element-container x))
+    (inner . ,(element-inner x))))
 
 
 ;;; Override write method
