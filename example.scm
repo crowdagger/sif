@@ -2,6 +2,7 @@
 (add-to-load-path ".")
 
 (import (oop goops)
+        (ice-9 pretty-print)
         (sif world)
         (sif element))
 
@@ -31,5 +32,5 @@
 (write (element->list v))
 (newline)
 
-(display w)
+(pretty-print w #:display? #t #:width 50)
 (newline)

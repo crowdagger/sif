@@ -124,7 +124,7 @@
    (inner . ,(element-inner x))))
 
 
-
+;;; Override write method
 (define-method (write (x <element>) . rest)
   (apply write (cons (element->list x)
                      rest)))
