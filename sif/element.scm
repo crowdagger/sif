@@ -1,5 +1,6 @@
 (define-module (sif element))
 (export <element>
+        element->alist element->list
         element-read id list-actions action add!)
 
 (import (oop goops)
@@ -17,12 +18,12 @@
       #:init-keyword #:id
       #:getter element-id)
   (name #:init-value ""
-        #:getter name
+        #:getter element-name
         #:init-keyword #:name)
   (actions #:init-form (make-hash-table)
            #:getter actions)
   (description #:init-value ""
-               #:getter description
+               #:getter element-description
                #:init-keyword #:description)
   (container #:init-value #f
              #:getter element-container
@@ -104,20 +105,29 @@
                 tail)
       e)))
 
+;;; Export an element to a standard list
+(define-generic element->list)
+(define-method (element->list (x <element>))
+  (list (class-name (class-of x))
+        (element->alist x)))
+
+;;; Transform the element values to a standard association list
+;;;
+;;; Classes that inherit element should override this method (but
+;;; call it with (next-method)) to complement it
+(define-generic element->alist)
+(define-method (element->alist (x <element>))
+  `(
+   (name . ,(element-name x))
+   (description . ,(element-description x))
+   (container . ,(element-container x))
+   (inner . ,(element-inner x))))
+
+
+
 (define-method (write (x <element>) . rest)
-  (let* ([ctnr (if (null? (element-container x))
-                   ""
-                   (format #f "(container . ~a)" (element-container x)))]
-         [s (format #f "(~a ((name . ~s) (description . ~s) (inner . ~a) ~a))"
-                   (class-name (class-of x))
-                   (name x)
-                   (description x)
-                   (if (null? (element-inner x))
-                       "()"
-                       (format #f "~s" (element-inner x)))
-                   ctnr
-                   )])
-  (apply display (cons s rest))))
+  (apply write (cons (element->list x)
+                     rest)))
 
 ;;; Adds an action to an element.
 ;;; Hander must be of the form (lambda (element . args))
@@ -138,7 +148,7 @@
 (define-generic message-down)
 (define-method (message-down (x <element>) msg)
   ; By default we do nothing apart from forwarding it to inner
-  (display (name x))
+  (display (element-name x))
   (display " received: ")
   (display msg)
   (newline)
@@ -150,7 +160,7 @@
 (define-method (look-at (x <element>) . rest)
   (let-keywords rest #t
                 ([nested #f])
-                (display (name x))
+                (display (element-name x))
                 (newline)
                 (when (and (not nested)
                            (not (null? (element-inner x))))

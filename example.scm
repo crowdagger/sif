@@ -28,7 +28,7 @@
             (lambda (port)
               (element-read w port))))
 
-(display v)
+(write (element->list v))
 (newline)
 
 (display w)
