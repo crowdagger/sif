@@ -31,3 +31,5 @@
 (display v)
 (newline)
 
+(display w)
+(newline)
