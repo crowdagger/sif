@@ -10,7 +10,7 @@
 (define table (make <element> #:name "Table" #:world w))
 
 ;(write table)
-(add! room table)
+(element-add! room table)
 
 (action room 'look-at)
 (newline)

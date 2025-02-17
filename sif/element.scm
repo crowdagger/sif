@@ -2,7 +2,7 @@
 (export <element>
         element->alist element->list 
         element-read id list-actions action
-        add! look-at)
+        element-add! look-at)
 
 (import (oop goops)
         (ice-9 optargs)
@@ -51,13 +51,13 @@
       
   ;; Add default actions 
   (add-action e 'look-at (λ (e) (look-at e)))
-  (add-action e 'add (λ (e1 e2) (add! e1 e2))))
+  (add-action e 'add (λ (e1 e2) (element-add! e1 e2))))
 
 ;;; Adds an element to another
 ;;;
 ;;; Elements must be in the same world (duh) else bad things will happen
-(define-generic add!)
-(define-method (add! (e1 <element>) (e2 <element>))
+(define-generic element-add!)
+(define-method (element-add! (e1 <element>) (e2 <element>))
   ;; First, e2 to e1
   (let* ([world (element-world e1)]
          [world2 (element-world e2)]
@@ -104,6 +104,7 @@
     (when (eq? #f handler)
       (error "Unsupported action" action))
     (apply handler (cons e args))))
+
 
 
 ;;; Export an element to a standard list
