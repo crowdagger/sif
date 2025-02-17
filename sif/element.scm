@@ -34,6 +34,25 @@
          #:init-keyword #:inner)
 )
 
+;;; Method used when (make <element>) is called
+(define-method (initialize (e <element>) initargs)
+  ;; Call parent method
+  (next-method)
+  ;; Add self to world and set id
+  (if (element-world e)
+      (let ([id (world-add! (element-world e)
+                            e)])
+        (when (and (slot-ref e 'id)
+                   (not (eq? (slot-ref e 'id)
+                             id)))
+          (error "Previous id does not match world's id"))
+        (slot-set! e 'id id))
+      (error "Need to specify a word to create an element"))
+      
+  ;; Add default actions 
+  (add-action e 'look-at (λ (e) (look-at e)))
+  (add-action e 'add (λ (e1 e2) (add! e1 e2))))
+
 ;;; Adds an element to another
 ;;;
 ;;; Elements must be in the same world (duh) else bad things will happen
@@ -68,24 +87,7 @@
       (error "Elements are from different worlds" e1 e2))
     (slot-set! e1 'inner new-list)))
 
-;;; Method used when (make <element>) is called
-(define-method (initialize (e <element>) initargs)
-  ;; Call parent method
-  (next-method)
-  ;; Add self to world and set id
-  (if (element-world e)
-      (let ([id (world-add! (element-world e)
-                            e)])
-        (when (and (slot-ref e 'id)
-                   (not (eq? (slot-ref e 'id)
-                             id)))
-          (error "Previous id does not match world's id"))
-        (slot-set! e 'id id))
-      (error "Need to specify a word to create an element"))
-      
-  ;; Add default actions 
-  (add-action e 'look-at (λ (e) (look-at e)))
-  (add-action e 'add (λ (e1 e2) (add! e1 e2))))
+
 
 ;;; List all valid actions for an element
 (define-generic list-actions)
@@ -103,14 +105,6 @@
       (error "Unsupported action" action))
     (apply handler (cons e args))))
 
-(define (element-read world port)
-  "Read an element from optional port"
-  (match-let* ([(clss tail) (read port)])
-    (let ([e (make <element> #:world world)])
-      (for-each (lambda (v)
-                  (slot-set! e (car v) (cdr v)))
-                tail)
-      e)))
 
 ;;; Export an element to a standard list
 (define-generic element->list)

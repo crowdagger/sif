@@ -1,14 +1,12 @@
-(add-to-load-path ".")
-(add-to-load-path ".")
-
 (import (oop goops)
         (ice-9 pretty-print)
         (sif world)
-        (sif element))
+        (sif element)
+        (sif room))
 
 (define w (make <world>))
 
-(define room (make <element> #:name "Room" #:world w))
+(define room (make <room> #:name "Room" #:world w))
 (define table (make <element> #:name "Table" #:world w))
 
 ;(write table)

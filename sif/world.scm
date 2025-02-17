@@ -4,8 +4,10 @@
         world->list list->world)
 (import (oop goops)
         (ice-9 match)
+        (crow-utils threading)
         (crow-utils vec)
-        (sif element))
+        (sif element)
+        (sif room))
 
 ;;; Class used to store all elements.
 (define-class <world> ()
@@ -29,12 +31,9 @@
 
 (define (world->list w)
   "Converts the world w to a standard lisp list"
-  (let* ([elements ((world-elements w) '->list)]
-         [elements (filter (lambda (x) x)
-                           elements)] ; remove #f values
-         [elements (map (λ (e)
-                         (element->list e))
-                        elements)])
+  (let* ([elements (->> ((world-elements w) '->list)
+                       (filter (lambda (x) x))
+                       (map (lambda (e) (element->list e))))])
     `(<world> ((elements . ,elements)))))
 
 ;;; Override write method
@@ -47,6 +46,7 @@ Also adds it to the world"
   (match-let ([(clss tail) list])
     (let ([e (cond
               [(eq? clss '<element>) (make <element> #:world world)]
+              [(eq? clss '<room>) (make <room> #:world world)]
               [else (error "Invalid class" clss)])])
       (for-each (lambda (v)
                   (if (eq? (car v) 'id)
