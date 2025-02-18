@@ -20,7 +20,7 @@
   (next-method)
 
   ;; Add room's actions
-  (add-action r 'connections (λ (r) (list-connections r)))
+  (element-add-action r 'connections (λ (r) (list-connections r)))
   )
 
 ;;; Overrides description to show inner objects

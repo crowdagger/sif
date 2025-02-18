@@ -19,7 +19,7 @@
 (element-add! room table)
 (agent-move! player room)
 
-(display (action room 'describe))
+(display (element-action room 'describe))
 (newline)
 (write room)
 (newline)
@@ -35,3 +35,4 @@
 
 (display (world->list w2))
 (newline)
+(world-act! w)

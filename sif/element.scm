@@ -3,9 +3,8 @@
         element->alist element->list 
         element-id element-world element-container element-inner
         element-name element-description
-        list-actions action add-action
-        element-add! describe)
-
+        element-list-actions element-action element-add-action
+        element-add! element-describe element-act!)
 (import (oop goops)
         (ice-9 optargs)
         (ice-9 match)
@@ -52,7 +51,7 @@
       (error "Need to specify a word to create an element"))
       
   ;; Add default actions
-  (add-action e 'describe (λ (e) (describe e)))
+  (element-add-action e 'describe (λ (e) (element-describe e)))
 ;  (add-action e 'look-at (λ (e) (look-at e)))
 ;  (add-action e 'add (λ (e1 e2) (element-add! e1 e2))))
 )
@@ -77,11 +76,11 @@
       ;; We also need to remove e2 from its previous container
       (when previous
         (let ([previous (world-ref world previous)])
-          (remove! previous e2))))))
+          (element-remove! previous e2))))))
 
 ;; Remove an element from another containing it
-(define-generic remove!)
-(define-method (remove! (e1 <element>) (e2 <element>))
+(define-generic element-remove!)
+(define-method (element-remove! (e1 <element>) (e2 <element>))
   (let* ([world (element-world e1)]
          [world2 (element-world e2)]
          [id (element-id e2)]
@@ -94,14 +93,14 @@
 
 
 ;; List all valid actions for an element
-(define-generic list-actions)
-(define-method (list-actions (e <element>))
+(define-generic element-list-actions)
+(define-method (element-list-actions (e <element>))
   (hash-map->list (lambda (action _) action)
                   (actions e)))
 
 ;; Perform the action on element
-(define-generic action)
-(define-method (action (e <element>) action . args)
+(define-generic element-action)
+(define-method (element-action (e <element>) action . args)
   (unless (symbol? action)
     (error "Must be a symbol" action))
   (let ([handler (hashq-ref (actions e) action)])
@@ -138,8 +137,8 @@
 
 ;; Adds an action to an element.
 ;; Hander must be of the form (lambda (element . args))
-(define-generic add-action)
-(define-method (add-action (x <element>) symbol handler)
+(define-generic element-add-action)
+(define-method (element-add-action (x <element>) symbol handler)
   (unless (symbol? symbol)
     (error "Must be a symbol" symbol))
   (unless (procedure? handler)
@@ -147,8 +146,8 @@
   (hashq-set! (actions x) symbol handler))
 
 ;; Describes an element
-(define-generic describe)
-(define-method (describe (e <element>))
+(define-generic element-describe)
+(define-method (element-describe (e <element>))
   (format #f "~a\n~a\n"
           (element-name e)
           (element-description e)))
@@ -158,6 +157,7 @@
 ;;
 ;; Most elements won't do anything except return false, except agents
 ;; or maybe eg if an element has a lifetime or whatever
-(define-generic element-act)
-(define-method (element-act (e <element>))
+(define-generic element-act!)
+(define-method (element-act! (e <element>))
+  (display "Do nothing\n")
   #f)

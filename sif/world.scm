@@ -1,7 +1,8 @@
 (define-module (sif world))
 (export <world>
         world-add! world-add-list! world-ref world-del!
-        world->list list->world)
+        world->list list->world
+        world-act!)
 (import (oop goops)
         (ice-9 match)
         (crow-utils threading)
@@ -79,3 +80,15 @@ Also adds it to the world"
             (world-add-list! world (car rest))
             (lp world (cdr rest)))))]
     [else (error "Invalid list pattern for a world" lst)]))
+
+
+;; Call act on all elements
+(define (world-act! w)
+  "Run a time step of all elements in world"
+  (let ([len ((world-elements w) 'length)])
+    (let lp ([i 0])
+      (if (>= i len)
+          #t
+          (begin
+            (element-act! (world-ref  w i))
+            (lp (+ 1 i)))))))

@@ -7,11 +7,11 @@
 (test-begin "world")
 (test-group "class"
   (define w (make <world>))
-  (test-equal 0 (world-add! w 42))
-  (test-equal 1 (world-add! w "foo"))
-  (test-equal 42 (world-ref w 0))
+  (test-equal "world-add!" 0 (world-add! w 42))
+  (test-equal "world-add!" 1 (world-add! w "foo"))
+  (test-equal "world-ref" 42 (world-ref w 0))
   (world-del! w 0)
-  (test-equal #f (world-ref w 0))
+  (test-equal "world-del!" #f (world-ref w 0))
   )
 
 (test-group "de/serialization"
@@ -22,10 +22,10 @@
   
   (define lst (world->list w))
   (define world2 (list->world lst))
-  (test-equal "Room" (slot-ref (world-ref world2 0) 'name))
-  (test-equal "Table" (slot-ref (world-ref world2 1) 'name))
+  (test-equal "list->world" "Room" (slot-ref (world-ref world2 0) 'name))
+  (test-equal "list->world" "Table" (slot-ref (world-ref world2 1) 'name))
 
   (define lst2 (world->list world2))
-  (test-equal lst lst2)
+  (test-equal "world->list" lst lst2)
   )
 (test-end "world")
