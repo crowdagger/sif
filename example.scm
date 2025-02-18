@@ -31,7 +31,8 @@
 (newline)
 
 (define w2 (list->world
-            (world->list w)))
+            (world->list w)
+            (current-module)))
 
 (display (world->list w2))
 (newline)

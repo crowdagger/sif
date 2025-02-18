@@ -6,10 +6,8 @@
 (import (oop goops)
         (ice-9 match)
         (crow-utils threading)
-        (crow-utils vec)
         (sif element)
-        (sif agent)
-        (sif room))
+        (crow-utils vec))
 
 ;;; Class used to store all elements.
 (define-class <world> ()
@@ -44,15 +42,14 @@
 (define-method (write (w <world>) . args)
   (apply write (cons (world->list w) args)))
 
-(define (world-add-list! world list)
-  "Transform a list to an element in given world.
-Also adds it to the world"
+(define (world-add-list! world list module)
+  "Transform a list to an element in given world. Also adds it to the world
+
+Module should be set to (current-module), or any module containing all the bindings
+for classes used in list"
   (match-let ([(clss tail) list])
-    (let ([e (cond
-              [(eq? clss '<element>) (make <element> #:world world)]
-              [(eq? clss '<room>) (make <room> #:world world)]
-              [(eq? clss '<agent>) (make <agent> #:world world)]
-              [else (error "Invalid class" clss)])])
+    (let* ([clss (eval clss module)]
+           [e (make clss #:world world)])
       (for-each (lambda (v)
                   (if (eq? (car v) 'id)
                       (unless (eq? (slot-ref e 'id)
@@ -66,10 +63,13 @@ Also adds it to the world"
       e)))
 
 
-(define (list->world lst)
-  "Transform a list of world to a world object, allowing deserialization"
+(define (list->world lst module)
+  "Transform a list of world to a world object, allowing deserialization
+
+module should be set to (current-module) once you have loaded all classes
+you might neeed"
   (match lst
-    [(clss (('elements . elements))) 
+    [(clss (('elements . elements)))
      (unless (eq? clss '<world>)
        (error "Invalid class, expected world" clss))
      (let lp ([world (make <world>)]
@@ -77,7 +77,7 @@ Also adds it to the world"
        (if (null? rest)
            world
           (begin
-            (world-add-list! world (car rest))
+            (world-add-list! world (car rest) module)
             (lp world (cdr rest)))))]
     [else (error "Invalid list pattern for a world" lst)]))
 

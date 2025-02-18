@@ -21,7 +21,7 @@
   (element-add! room table)
   
   (define lst (world->list w))
-  (define world2 (list->world lst))
+  (define world2 (list->world lst (current-module)))
   (test-equal "list->world" "Room" (slot-ref (world-ref world2 0) 'name))
   (test-equal "list->world" "Table" (slot-ref (world-ref world2 1) 'name))
 
