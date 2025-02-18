@@ -8,10 +8,10 @@
         (sif element))
 
 
-;;; Agent, eg player
+;; Agent, eg player
 (define-class <agent> (<element>))
 
-;;; Overrides usual suspects
+;; Overrides usual suspects
 (define-method (initialize (a <agent>) initargs)
   (next-method))
 
@@ -20,7 +20,7 @@
    (next-method)))
 
 
-;;; Move to a room
+;; Move to a room
 (define-generic agent-move!)
 (define-method (agent-move! (a <agent>)
                            (r <room>))
@@ -36,7 +36,7 @@
         (element-add! r a)
         (error "Current room is not connected to targer room" r))))
 
-;;; List all current objects
+;; List all current objects
 (define-generic agent-list-objects)
 (define-method (agent-list-objects (a <agent>))
   (let* ([world (element-world a)]
@@ -57,7 +57,7 @@
                room-objects)])
     (append room-lst room-objects)))
 
-;;; List possible moves
+;; List possible moves
 (define-generic agent-list-moves)
 (define-method (agent-list-moves (a <agent>))
   (let ([world (element-world a)])
@@ -67,3 +67,23 @@
                                (element-container a))])
           (room-connections room)))))
         
+
+;; Override act method
+(define-method (element-act! (a <agent>))
+  ;; First, show possible moves
+  (define (list-actions i)
+    (let* ([w (element-world a)]
+           [e (world-ref w i)]
+           [actions (element-list-actions e)])
+      (apply string-append
+             (map (lambda (a)
+                    (format #f "~a " a))
+                  actions))))
+           
+  (for-each (lambda (e)
+         (format #t "~a: ~a\n"
+                 (car e)
+                 (list-actions (cdr e))))
+       (agent-list-objects a))
+  ;; Todo: get input
+  )

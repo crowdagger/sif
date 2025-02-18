@@ -159,5 +159,5 @@
 ;; or maybe eg if an element has a lifetime or whatever
 (define-generic element-act!)
 (define-method (element-act! (e <element>))
-  (display "Do nothing\n")
+  (format #t "~a: do nothing\n" (element-name e))
   #f)
