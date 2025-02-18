@@ -1,7 +1,8 @@
 (define-module (sif element))
 (export <element>
         element->alist element->list 
-        element-read id list-actions action
+        element-read element-id list-actions action
+        add-action
         element-add! look-at)
 
 (import (oop goops)

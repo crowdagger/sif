@@ -18,7 +18,7 @@
   (define w (make <world>))
   (define room (make <element> #:name "Room" #:world w))
   (define table (make <element> #:name "Table" #:world w))
-  (add! room table)
+  (element-add! room table)
   
   (define lst (world->list w))
   (define world2 (list->world lst))
