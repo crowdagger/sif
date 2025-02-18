@@ -2,6 +2,7 @@
         (ice-9 pretty-print)
         (sif world)
         (sif element)
+        (sif agent)
         (sif room))
 
 (define w (make <world>))
@@ -9,6 +10,7 @@
 (define room (make <room> #:name "Bedroom" #:world w))
 (define hall (make <room> #:name "Living room" #:world w))
 (define table (make <element> #:name "Table" #:world w))
+(define player (make <agent> #:name "Toto" #:world w))
 
 
 (room-connect room hall "Living room")

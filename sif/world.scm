@@ -7,6 +7,7 @@
         (crow-utils threading)
         (crow-utils vec)
         (sif element)
+        (sif agent)
         (sif room))
 
 ;;; Class used to store all elements.
@@ -47,6 +48,7 @@ Also adds it to the world"
     (let ([e (cond
               [(eq? clss '<element>) (make <element> #:world world)]
               [(eq? clss '<room>) (make <room> #:world world)]
+              [(eq? clss '<agent>) (make <agent> #:world world)]
               [else (error "Invalid class" clss)])])
       (for-each (lambda (v)
                   (if (eq? (car v) 'id)
