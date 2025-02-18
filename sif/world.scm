@@ -16,11 +16,13 @@
             #:getter world-elements))
 
 
+;; Adds an element to the world
 (define (world-add! world e)
   "Add an element to the world, return its index"
   ((world-elements world) 'push! e)
   (1- ((world-elements world) 'length)))
 
+;; Get ith element of world
 (define (world-ref world i)
   "Returns the element number i of world, or #f if it has been deleted"
   ((world-elements world) 'get i))

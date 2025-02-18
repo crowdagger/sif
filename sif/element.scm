@@ -57,9 +57,9 @@
 ;  (add-action e 'add (λ (e1 e2) (element-add! e1 e2))))
 )
 
-;;; Adds an element to another
-;;;
-;;; Elements must be in the same world (duh) else bad things will happen
+;; Adds an element to another
+;;
+;; Elements must be in the same world (duh) else bad things will happen
 (define-generic element-add!)
 (define-method (element-add! (e1 <element>) (e2 <element>))
   ;; First, e2 to e1
@@ -79,7 +79,7 @@
         (let ([previous (world-ref world previous)])
           (remove! previous e2))))))
 
-;;; Remove an element from another containing it
+;; Remove an element from another containing it
 (define-generic remove!)
 (define-method (remove! (e1 <element>) (e2 <element>))
   (let* ([world (element-world e1)]
@@ -93,13 +93,13 @@
 
 
 
-;;; List all valid actions for an element
+;; List all valid actions for an element
 (define-generic list-actions)
 (define-method (list-actions (e <element>))
   (hash-map->list (lambda (action _) action)
                   (actions e)))
 
-;;; Perform the action on element
+;; Perform the action on element
 (define-generic action)
 (define-method (action (e <element>) action . args)
   (unless (symbol? action)
@@ -111,16 +111,16 @@
 
 
 
-;;; Export an element to a standard list
+;; Export an element to a standard list
 (define-generic element->list)
 (define-method (element->list (x <element>))
   (list (class-name (class-of x))
         (element->alist x)))
 
-;;; Transform the element values to a standard association list
-;;;
-;;; Classes that inherit element should override this method (but
-;;; call it with (next-method)) to complement it
+;; Transform the element values to a standard association list
+;;
+;; Classes that inherit element should override this method (but
+;; call it with (next-method)) to complement it
 (define-generic element->alist)
 (define-method (element->alist (x <element>))
   `(
@@ -131,13 +131,13 @@
     (inner . ,(element-inner x))))
 
 
-;;; Override write method
+;; Override write method
 (define-method (write (x <element>) . rest)
   (apply write (cons (element->list x)
                      rest)))
 
-;;; Adds an action to an element.
-;;; Hander must be of the form (lambda (element . args))
+;; Adds an action to an element.
+;; Hander must be of the form (lambda (element . args))
 (define-generic add-action)
 (define-method (add-action (x <element>) symbol handler)
   (unless (symbol? symbol)
@@ -146,9 +146,18 @@
     (error "Must be a procedure" handler))
   (hashq-set! (actions x) symbol handler))
 
-;;; Describes an element
+;; Describes an element
 (define-generic describe)
 (define-method (describe (e <element>))
   (format #f "~a\n~a\n"
           (element-name e)
           (element-description e)))
+
+
+;; Method called each "turn".
+;;
+;; Most elements won't do anything except return false, except agents
+;; or maybe eg if an element has a lifetime or whatever
+(define-generic element-act)
+(define-method (element-act (e <element>))
+  #f)
