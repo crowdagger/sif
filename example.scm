@@ -17,6 +17,7 @@
 (room-connect hall room "Door")
 ;(write table)
 (element-add! room table)
+(agent-move player room)
 
 (action room 'look-at)
 (newline)

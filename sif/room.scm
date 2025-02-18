@@ -1,6 +1,6 @@
 (define-module (sif room))
 (export <room>
-        room-connect)
+        room-connect room-connections)
 (import (oop goops)
         (sif element)
         (sif world))
