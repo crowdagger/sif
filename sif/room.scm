@@ -2,6 +2,7 @@
 (export <room>
         room-connect room-connections)
 (import (oop goops)
+        (ice-9 format)
         (sif element)
         (sif world))
 
@@ -21,6 +22,25 @@
   ;; Add room's actions
   (add-action r 'connections (λ (r) (list-connections r)))
   )
+
+;;; Overrides description to show inner objects
+(define-method (describe (r <room>))
+  (let* ([world (element-world r)]
+         [inner (element-inner r)]
+         [inner
+          (map (lambda (e)
+                 (string-append 
+                  (element-name (world-ref world
+                                         e))
+                               "\n"))
+               inner)]
+         [inner (if (null? inner)
+                    ""
+                    (format #f "Contains:\n~a"
+                            (apply string-append inner)))])
+  (format #f "~a~a"
+          (next-method)
+          inner)))
 
 
 (define-method (element->alist (r <room>))

@@ -19,7 +19,7 @@
 (element-add! room table)
 (agent-move! player room)
 
-(action room 'look-at)
+(display (action room 'describe))
 (newline)
 (write room)
 (newline)

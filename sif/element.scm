@@ -2,10 +2,9 @@
 (export <element>
         element->alist element->list 
         element-id element-world element-container element-inner
-        element-name
-        list-actions action
-        add-action
-        element-add! look-at)
+        element-name element-description
+        list-actions action add-action
+        element-add! describe)
 
 (import (oop goops)
         (ice-9 optargs)
@@ -52,9 +51,11 @@
         (slot-set! e 'id id))
       (error "Need to specify a word to create an element"))
       
-  ;; Add default actions 
-  (add-action e 'look-at (λ (e) (look-at e)))
-  (add-action e 'add (λ (e1 e2) (element-add! e1 e2))))
+  ;; Add default actions
+  (add-action e 'describe (λ (e) (describe e)))
+;  (add-action e 'look-at (λ (e) (look-at e)))
+;  (add-action e 'add (λ (e1 e2) (element-add! e1 e2))))
+)
 
 ;;; Adds an element to another
 ;;;
@@ -145,36 +146,9 @@
     (error "Must be a procedure" handler))
   (hashq-set! (actions x) symbol handler))
 
-(define-generic message-up)
-(define-method (message-up (x <element>) msg)
-  (unless (element-container x)
-    (message-up (element-container x)
-                msg)))
-
-(define-generic message-down)
-(define-method (message-down (x <element>) msg)
-  ; By default we do nothing apart from forwarding it to inner
-  (display (element-name x))
-  (display " received: ")
-  (display msg)
-  (newline)
-  (map (λ (x) (message-down x msg))
-       (element-inner x)))
-
-;;; Command to look at object and show description.
-(define-generic look-at)
-(define-method (look-at (x <element>) . rest)
-  (let-keywords rest #t
-                ([nested #f])
-                (display (element-name x))
-                (newline)
-                (when (and (not nested)
-                           (not (null? (element-inner x))))
-                  (display "Contains:\n")
-                  (map (λ (e)
-                         (display (look-at (world-ref (element-world x)
-                                                      e)
-                                           #:nested #t)))
-                       (element-inner x)))))
-                           
-  
+;;; Describes an element
+(define-generic describe)
+(define-method (describe (e <element>))
+  (format #f "~a\n~a\n"
+          (element-name e)
+          (element-description e)))
