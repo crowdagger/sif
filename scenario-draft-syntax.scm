@@ -7,6 +7,28 @@
      (((narration "... or other one")))))
 
 
+
+
+
+(match state
+  (('1 'talk)
+   (narration "Something happened")
+   (narration "And something else")
+   '2)
+  (('2 'talk)
+   (narration "Then...")
+   '3)
+  (('3 'talk)
+   ...
+   '4)
+  ('4
+   (if ???
+       (begin (narration "choice 1")
+              '5)
+       (begin (narration "choice 2")
+              '6)))
+
+
 (define (f1)
   (narration "Something happened")
   (narration "And something else")
