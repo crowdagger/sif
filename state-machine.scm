@@ -4,37 +4,61 @@
 (define-class <state> ()
   (id #:init-value 'default
       #:init-keyword #:id
-      #:getter state-id))
+      #:getter state-id)
+  (handlers #:init-value '()
+            #:init-keywords #:handlers
+            #:getter state-handlers))
+
+;; Returns the handler of a state for a given event
+;;
+;; Returns a procedure or errors if event isn't handled
+(define (state-get-handler state event)
+  (let ([handler (assoc-ref (state-handlers state)
+                            event)])
+    (if handler
+        handler
+        (error "Unhandled event" event))))
+
+;; Add a handler for an event.
+;;
+;; Handler must be a procedure receiving state and event as parameters
+(define (state-add-handler! state event handler)
+  (slot-set! state 'handlers
+             (acons event handler
+                    (slot-ref state 'handlers))))
 
 (define-generic state-event)
 ;; Dummy implementation
 (define-method (state-event (state <state>) event)
-  (error "Unrecognized event" event))
+  (let ([handler (state-get-handler state event)])
+    (if handler
+        (handler state event)
+        (error "Unrecognized event" event))))
 
 
-(define-class <state-closed> (<state>))
-(define-method (state-event (state <state-closed>) event)
-  (match event
-    ('open
-     (display "Opening\n")
-     'open)
-    ('close
-     (display "Already closed\n")
-     'closed)
-    (else
-     (next-method))))
+(define (state-closed)
+  (let* ([state (make <state> #:id 'closed)])
+    (state-add-handler! state 'open
+                        (lambda (_s _e)
+                          (display "Opening\n")
+                          'open))
+    (state-add-handler! state 'close
+                        (lambda (_s _e)
+                          (display "Already closed\n")
+                          'closed))
+    state))
 
-(define-class <state-open> (<state>))
-(define-method (state-event (state <state-open>) event)
-  (match event
-    ('close
-     (display "Closing\n")
-     'closed)
-    ('open
-     (display "Already open\n")
-     'open)
-    (else
-     (next-method))))
+(define (state-open)
+  (let* ([state (make <state> #:id 'open)])
+    (state-add-handler! state 'open
+                        (lambda (_s _e)
+                          (display "Already open\n")
+                          'open))
+    (state-add-handler! state 'close
+                        (lambda (_s _e)
+                          (display "Closing\n")
+                          'closed))
+    state))
 
 (define-class <behaviour> ()
   (current-state #:init-value 'init
@@ -60,5 +84,7 @@
 
 
 (define b (make <behaviour> #:init-state 'open))
-(behaviour-add-state! b 'open (make <state-open>))
-(behaviour-add-state! b 'closed (make <state-closed>))
+(behaviour-add-state! b 'open (state-open))
+(behaviour-add-state! b 'closed (state-closed))
+
+(behaviour-event! b 'open)
