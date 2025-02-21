@@ -2,7 +2,7 @@
 (export <description>)
 (import (oop goops)
         (ice-9 match)
-        (sif element)
+        (sif object)
         (sif component))
 
 ;; Basic description component. Takes a reference to an element,
@@ -31,3 +31,13 @@
 (define-method (component-list-events (d <description>))
   (cons 'describe
         (next-method)))
+
+(define-method (object->list (d <description>))
+  (append (next-method)
+          `(#:description ,(get-description d))))
+
+
+(define d (make <description> #:description "Descr"))
+(object->list d)
+(display (object->list d))
+(newline)

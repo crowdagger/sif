@@ -3,7 +3,8 @@
         component-handle-event
         component-list-events)
 (import (oop goops)
-        (ice-9 match))
+        (ice-9 match)
+        (sif object))
 
 
 ;; Component that can be added to any elements.
@@ -12,7 +13,7 @@
 ;; generic functions component-handle-event and component-list-events
 ;;
 ;; A component is thus quite similar to an interface and shall often be named stull-able
-(define-class <component> ()
+(define-class <component> (<sif-object>)
   (id #:init-value 'component
       #:init-keyword #:id
       #:getter component-id))
@@ -30,3 +31,5 @@
 
 (define-method (component-list-events (component <component>) args)
   '())
+
+
