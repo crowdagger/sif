@@ -10,7 +10,12 @@
 ;;
 ;; A component handles events, and must thus implement the
 ;; generic functions component-handle-event and component-list-events
-(define-class <component> ())
+;;
+;; A component is thus quite similar to an interface and shall often be named stull-able
+(define-class <component> ()
+  (id #:init-value 'component
+      #:init-keyword #:id
+      #:getter component-id))
 
 ;; Handle a given event. Returns #f is event is not handled
 (define-generic component-handle-event)
@@ -20,8 +25,8 @@
 
 ;; The basic methods don't do much, a component implementation must
 ;; override them
-(define-method (component-handle-event (component <component>) event)
+(define-method (component-handle-event (component <component>) event args)
   #f)
 
-(define-method (component-list-events (component <component>))
+(define-method (component-list-events (component <component>) args)
   '())

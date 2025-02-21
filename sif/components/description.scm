@@ -1,0 +1,33 @@
+(define-module (sif components description))
+(export <description>)
+(import (oop goops)
+        (ice-9 match)
+        (sif element)
+        (sif component))
+
+;; Basic description component. Takes a reference to an element,
+;; and describes it
+;;
+;; id: 'description
+;;
+;; Handles events :
+;; * describe
+(define-class <description> (<component>)
+  (description #:init-value ""
+               #:init-keyword #:description
+               #:getter get-description))
+
+(define-method (initialize (d <description>) initargs)
+  (next-method)
+  (slot-set! d 'id 'description))
+
+(define-method (component-handle-event (d <description>) event)
+  (match event
+    ('describe
+     (get-description d))
+    (else
+     (next-method))))
+
+(define-method (component-list-events (d <description>))
+  (cons 'describe
+        (next-method)))
