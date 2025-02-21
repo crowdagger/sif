@@ -35,9 +35,3 @@
 (define-method (object->list (d <description>))
   (append (next-method)
           `(#:description ,(get-description d))))
-
-
-(define d (make <description> #:description "Descr"))
-(object->list d)
-(display (object->list d))
-(newline)
