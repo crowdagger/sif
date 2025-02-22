@@ -21,14 +21,14 @@
   (next-method)
   (slot-set! d 'id 'description))
 
-(define-method (component-handle-event (d <description>) event)
+(define-method (component-handle-event (d <description>) event . args)
   (match event
     ('describe
      (get-description d))
     (else
      (next-method))))
 
-(define-method (component-list-events (d <description>))
+(define-method (component-list-events (d <description>) . args)
   (cons 'describe
         (next-method)))
 
