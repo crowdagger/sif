@@ -1,6 +1,0 @@
-[submodule "postiche"]
-	path = postiche
-	url = git@github.com:crowdagger/postiche.git
-[submodule "crow-utils"]
-	path = crow-utils
-	url = git@github.com:crowdagger/crow-utils.git

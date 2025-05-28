@@ -1,2 +1,0 @@
-# sif
-Scheme Interactive Fiction
