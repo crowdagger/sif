@@ -1,0 +1,22 @@
+(import (sif main)
+        (sif ui)
+        (ice-9 readline)
+        (ice-9 format)
+        (ice-9 match)
+        (ice-9 pretty-print)
+        (script characters)
+        (sif scene)
+        (language tree-il)
+        (script start))
+
+(sif-init start-scene)
+
+(clear-screen)
+(display "Press enter to start")
+(let main-loop ([ret 'continue])
+  (let ([input (readline)])
+    (match ret
+      (#f (display "End!"))
+      ('repeat (main-loop (sif-main input)))
+      (else (main-loop (sif-main))))))
+(newline)
